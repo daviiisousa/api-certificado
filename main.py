@@ -13,7 +13,7 @@ app = FastAPI()
 MODELO_CERTIFICADO = os.path.join(BASE_DIR, "modelo_certificado.png")
 FONTE_PATH = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO = 48
-POSICAO_X = 650
+POSICAO_X = 680
 POSICAO_Y = 720
 
 @app.post("/gerar-certificado")
