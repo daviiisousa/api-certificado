@@ -6,7 +6,7 @@ from fpdf import FPDF
 
 app = FastAPI()
 
-# Configurações fixas do certificado
+# Configurações fixas do certificadopip install uvicorn
 MODELO_CERTIFICADO = "modelo_certificado.png"  # Imagem sem nome
 FONTE_PATH = "Montserrat-VariableFont_wght.ttf"  # substitua pela fonte TT Norms se possuir
 FONTE_TAMANHO = 48
