@@ -3,12 +3,15 @@ from fastapi.responses import Response
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from fpdf import FPDF
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
 
 # Configurações fixas do certificadopip install uvicorn
-MODELO_CERTIFICADO = "modelo_certificado.png"  # Imagem sem nome
-FONTE_PATH = "Montserrat-VariableFont_wght.ttf"  # substitua pela fonte TT Norms se possuir
+MODELO_CERTIFICADO = os.path.join(BASE_DIR, "modelo_certificado.png")  # Imagem sem nome
+FONTE_PATH = os.path.join(BASE_DIR, "Montserrat-VariableFont_wght.ttf")  # substitua pela fonte TT Norms se possuir
 FONTE_TAMANHO = 48
 POSICAO_X = 642  # Posição exata aprovada por você (último ajuste)
 POSICAO_Y = 720
