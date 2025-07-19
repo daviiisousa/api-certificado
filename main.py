@@ -33,11 +33,12 @@ def gerar_certificado(dados: dict):
 
     temp_img_path = os.path.join(BASE_DIR, "temp_certificado.png")
     certificado.save(temp_img_path, format="PNG")
+    
     pdf.image(temp_img_path, x=0, y=0, w=certificado.size[0], h=certificado.size[1])
-    pdf.output(pdf_bytes)
-    pdf_bytes.seek(0)
+    pdf_output = pdf.output(dest='S').encode('latin1')  # <-- Corrige o erro
 
     if os.path.exists(temp_img_path):
         os.remove(temp_img_path)
 
-    return Response(content=pdf_bytes.getvalue(), media_type="application/pdf")
+    return Response(content=pdf_output, media_type="application/pdf")
+
