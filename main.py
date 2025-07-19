@@ -11,7 +11,7 @@ app = FastAPI()
 
 # Configurações fixas do certificado
 MODELO_CERTIFICADO = os.path.join(BASE_DIR, "modelo_certificado.png")
-FONTE_PATH = os.path.join(BASE_DIR, "Montserrat-VariableFont_wght.ttf")
+FONTE_PATH = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO = 48
 POSICAO_X = 642
 POSICAO_Y = 720
