@@ -1,51 +1,83 @@
+import os
 import tempfile
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import Response
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from fpdf import FPDF
-import os
 
 app = FastAPI()
+BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
+MODELO_FRENTE  = os.path.join(BASE_DIR, "modelo_certificado_frente.png")
+MODELO_VERSO   = os.path.join(BASE_DIR, "modelo_certificado_verso.png")
+FONTE_PATH     = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
+FONTE_TAMANHO  = 48
+FONTE_TAMANHO_SERIE  = 25
+POS_FRENTE     = (500, 720)
+POS_VERSO_NSER = (840, 1175)
 
-BASE_DIR = os.path.dirname(__file__)
-MODELO_CERTIFICADO = os.path.join(BASE_DIR, "modelo_certificado.png")
-FONTE_PATH       = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
-FONTE_TAMANHO    = 48
-POSICAO_X        = 500
-POSICAO_Y        = 720
+# arquivo onde guardamos o último serial
+COUNTER_FILE = os.path.join(BASE_DIR, "counter.txt")
+
+def get_next_serial() -> str:
+    # inicializa em 0 se ainda não existir
+    if not os.path.exists(COUNTER_FILE):
+        with open(COUNTER_FILE, "w") as f:
+            f.write("0")
+    # lê, incrementa e grava de volta
+    with open(COUNTER_FILE, "r+") as f:
+        last = int(f.read().strip() or "0")
+        nxt  = last + 1
+        f.seek(0)
+        f.write(str(nxt))
+        f.truncate()
+    # formata com 11 dígitos, preenchendo com zeros
+    return f"{nxt:011d}"
 
 @app.post("/gerar-certificado")
 def gerar_certificado(dados: dict):
     nome = dados.get("nome")
     if not nome:
-        raise HTTPException(status_code=400, detail="Nome não fornecido")
+        raise HTTPException(400, "Nome não fornecido")
 
-    # Abre template e desenha texto
-    certificado = Image.open(MODELO_CERTIFICADO).convert("RGB")
-    draw = ImageDraw.Draw(certificado)
+    # obtém o serial incremental
+    serial = get_next_serial()
+
+    # === Monta a frente ===
+    img_f = Image.open(MODELO_FRENTE).convert("RGB")
+    draw = ImageDraw.Draw(img_f)
     fonte = ImageFont.truetype(FONTE_PATH, FONTE_TAMANHO)
-    draw.text((POSICAO_X, POSICAO_Y), nome, font=fonte, fill="black")
+    draw.text(POS_FRENTE, nome, font=fonte, fill="black")
 
-    # Cria PDF
-    pdf = FPDF(unit="pt", format=[*certificado.size])
+    # cria PDF e coloca a frente
+    pdf = FPDF(unit="pt", format=[*img_f.size])
     pdf.add_page()
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpf:
+        img_f.save(tmpf.name, "PNG")
+        pdf.image(tmpf.name, 0, 0, *img_f.size)
+    os.remove(tmpf.name)
 
-    # Usa um arquivo temporário em /tmp (sempre gravável)
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        certificado.save(tmp.name, format="PNG")
-        tmp_path = tmp.name
+    # === Monta o verso com o nº de série ===
+    img_v = Image.open(MODELO_VERSO).convert("RGB")
+    draw = ImageDraw.Draw(img_v)
+    fonte_v = ImageFont.truetype(FONTE_PATH, int(FONTE_TAMANHO_SERIE * 0.8))
+    draw.text(POS_VERSO_NSER,
+              f"{serial}",
+              font=fonte_v,
+              fill="black")
 
-    pdf.image(tmp_path, x=0, y=0, w=certificado.size[0], h=certificado.size[1])
+    pdf.add_page()
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpv:
+        img_v.save(tmpv.name, "PNG")
+        pdf.image(tmpv.name, 0, 0, *img_v.size)
+    os.remove(tmpv.name)
 
-    # Gera bytes do PDF
-    pdf_output = pdf.output(dest='S').encode('latin1')
-
-    # Limpa o arquivo temporário
-    os.remove(tmp_path)
-    
+    # gera bytes e retorna com nome usando o serial
+    pdf_bytes = pdf.output(dest='S').encode('latin1')
     headers = {
-        "Content-Disposition": f"attachment; filename=certificado-{nome.replace(' ', '_')}.pdf"
+        "Content-Disposition":
+           f"attachment; filename=certificado-{serial}.pdf"
     }
-
-    return Response(content=pdf_output, media_type="application/pdf", headers=headers)
+    return Response(content=pdf_bytes,
+                    media_type="application/pdf",
+                    headers=headers)
