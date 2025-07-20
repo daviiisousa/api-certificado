@@ -43,5 +43,9 @@ def gerar_certificado(dados: dict):
 
     # Limpa o arquivo temporário
     os.remove(tmp_path)
+    
+    headers = {
+        "Content-Disposition": f"attachment; filename=certificado-{nome.replace(' ', '_')}.pdf"
+    }
 
-    return Response(content=pdf_output, media_type="application/pdf")
+    return Response(content=pdf_output, media_type="application/pdf", headers=headers)
