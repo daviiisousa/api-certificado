@@ -76,7 +76,7 @@ def gerar_certificado(dados: dict):
     pdf_bytes = pdf.output(dest='S').encode('latin1')
     headers = {
         "Content-Disposition":
-           f"attachment; filename=certificado-{serial}.pdf"
+           f"attachment; filename=certificado-{nome}.pdf"
     }
     return Response(content=pdf_bytes,
                     media_type="application/pdf",
