@@ -13,7 +13,7 @@ MODELO_VERSO   = os.path.join(BASE_DIR, "modelo_certificado_verso.png")
 FONTE_PATH     = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO  = 48
 FONTE_TAMANHO_SERIE  = 25
-POS_FRENTE     = (350, 720)
+POS_FRENTE     = (770, 720)
 POS_VERSO_NSER = (840, 1175)
 
 # arquivo onde guardamos o último serial
@@ -47,7 +47,13 @@ def gerar_certificado(dados: dict):
     img_f = Image.open(MODELO_FRENTE).convert("RGB")
     draw = ImageDraw.Draw(img_f)
     fonte = ImageFont.truetype(FONTE_PATH, FONTE_TAMANHO)
-    draw.text(POS_FRENTE, nome, font=fonte, fill="black")
+
+    bbox = draw.textbbox((0, 0), nome, font=fonte)
+    text_width = bbox[2] - bbox[0]
+
+    x_base, y_base = POS_FRENTE
+    x_adjusted = x_base - text_width // 2
+    draw.text((x_adjusted, y_base), nome, font=fonte, fill="black")
 
     # cria PDF e coloca a frente
     pdf = FPDF(unit="pt", format=[*img_f.size])
