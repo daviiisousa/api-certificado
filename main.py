@@ -13,7 +13,7 @@ MODELO_VERSO   = os.path.join(BASE_DIR, "modelo_certificado_verso.png")
 FONTE_PATH     = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO  = 48
 FONTE_TAMANHO_SERIE  = 25
-POS_FRENTE     = (500, 720)
+POS_FRENTE     = (350, 720)
 POS_VERSO_NSER = (840, 1175)
 
 # arquivo onde guardamos o último serial
