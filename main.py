@@ -8,7 +8,7 @@ from fpdf import FPDF
 
 app = FastAPI()
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
-MODELO_FRENTE  = os.path.join(BASE_DIR, "modelo_certificado_bronze.png")
+MODELO_FRENTE  = os.path.join(BASE_DIR, "modelo_certificado_frente_exito.png")
 MODELO_VERSO   = os.path.join(BASE_DIR, "modelo_certificado_verso.png")
 FONTE_PATH     = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO  = 48
