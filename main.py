@@ -8,12 +8,12 @@ from fpdf import FPDF
 
 app = FastAPI()
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
-MODELO_FRENTE  = os.path.join(BASE_DIR, "modelo_certificado_frente_exito.png")
+MODELO_FRENTE  = os.path.join(BASE_DIR, "modelo_certificado_IA_frente.jpg")
 MODELO_VERSO   = os.path.join(BASE_DIR, "modelo_certificado_verso.png")
 FONTE_PATH     = os.path.join(BASE_DIR, "Montserrat-Bold.ttf")
 FONTE_TAMANHO  = 48
 FONTE_TAMANHO_SERIE  = 25
-POS_FRENTE     = (770, 720)
+POS_FRENTE     = (980, 580)
 POS_VERSO_NSER = (840, 1175)
 
 # arquivo onde guardamos o último serial
@@ -64,19 +64,19 @@ def gerar_certificado(dados: dict):
     os.remove(tmpf.name)
 
     # === Monta o verso com o nº de série ===
-    img_v = Image.open(MODELO_VERSO).convert("RGB")
-    draw = ImageDraw.Draw(img_v)
-    fonte_v = ImageFont.truetype(FONTE_PATH, int(FONTE_TAMANHO_SERIE * 0.8))
-    draw.text(POS_VERSO_NSER,
-              f"{serial}",
-              font=fonte_v,
-              fill="black")
+    # img_v = Image.open(MODELO_VERSO).convert("RGB")
+    # draw = ImageDraw.Draw(img_v)
+    # fonte_v = ImageFont.truetype(FONTE_PATH, int(FONTE_TAMANHO_SERIE * 0.8))
+    # draw.text(POS_VERSO_NSER,
+    #           f"{serial}",
+    #           font=fonte_v,
+    #           fill="black")
 
-    pdf.add_page()
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpv:
-        img_v.save(tmpv.name, "PNG")
-        pdf.image(tmpv.name, 0, 0, *img_v.size)
-    os.remove(tmpv.name)
+    # pdf.add_page()
+    # with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpv:
+    #     img_v.save(tmpv.name, "PNG")
+    #     pdf.image(tmpv.name, 0, 0, *img_v.size)
+    # os.remove(tmpv.name)
 
     # gera bytes e retorna com nome usando o serial
     pdf_bytes = pdf.output(dest='S').encode('latin1')
