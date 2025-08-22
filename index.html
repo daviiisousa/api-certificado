@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar Planilha para n8n</title>
+</head>
+<body>
+  <h2>Upload de Planilha</h2>
+  <form action="https://SEU_WEBHOOK_AQUI" method="post" enctype="multipart/form-data">
+    <label for="file">Selecione a planilha:</label><br><br>
+    <input type="file" id="file" name="file" accept=".xls,.xlsx,.csv" required><br><br>
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+</html>
