@@ -5,6 +5,7 @@ from fastapi.responses import Response
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from fpdf import FPDF
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 app = FastAPI()
 BASE_DIR       = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +36,11 @@ def get_next_serial() -> str:
     return f"{nxt:011d}"
 
 @app.post("/gerar-certificado")
+@retry(
+    stop=stop_after_attempt(3),  # Tenta 3 vezes
+    wait=wait_exponential(multiplier=1, min=4, max=10),  # Espera exponencial entre tentativas
+    reraise=True  # Relança a última exceção após todas as tentativas
+)
 def gerar_certificado(dados: dict):
     nome = dados.get("nome")
     if not nome:
